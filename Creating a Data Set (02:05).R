@@ -45,3 +45,14 @@ cor(population.gre.v, population.gre.q)
 population.Npubs <- 20 + 3*scale(population.gre.v) + 2*scale(population.gre.q) + rnorm(n=population.N)
 describe(population.Npubs)
 hist(population.Npubs)
+
+# Let's do a study:
+participantIDs <- sample(1:length(population.Npubs), size=50) #sampling participants by creating a variable called participantID
+sample.gre.v <- population.gre.v[participantIDs]
+sample.gre.q <- population.gre.q[participantIDs]
+sample.Npubs <- population.Npubs[participantIDs]
+describe(sample.gre.v)
+describe(sample.gre.q)
+describe(sample.Npubs)
+plot(x=sample.gre.v, y=sample.Npubs)
+plot(x=sample.gre.q, y=sample.Npubs)
