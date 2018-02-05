@@ -56,3 +56,64 @@ describe(sample.gre.q)
 describe(sample.Npubs)
 plot(x=sample.gre.v, y=sample.Npubs)
 plot(x=sample.gre.q, y=sample.Npubs)
+
+
+# Let's say your prediction equation was:
+Pred  <- 20 + .3*(scale(sample.gre.v)) + 3*(scale(sample.gre.q)) #this is still a linear transformation as we're multiplying the variables by some value and adding. The number 20 in this example represents the intercept of the regression line and this effects each score. By adding or subtracting the value of the mean residuals you can come closer to zero.
+
+# Let's compute the residuals:
+Resid  <- sample.Npubs - Pred
+Resid2 <- Resid^2
+# Let's see how our prediction fits the actual Npubs:
+plot(sample.Npubs, Pred)
+sum(Resid) #the sum of residuals should be zero. This means that the residuals are balanced around the best fit line. Some positive values and some negative values similar to how numbers fall on either side of the mean.
+mean(Resid) #If the mean is positive then you are underestimating the intercept. If it is negative then you are overestimating the intercept. The intercept can be adjusted up or down
+sum(Resid2) #the definition of good fit is when the sum of the squared residuals are minimized
+plot(sample.Npubs, Resid) #Plot the residuals against the x axis
+plot(Pred,Resid) #looking to see if there is a pattern of over or underestimation. This might be a clue that you have adjust your slope
+
+#If we try this process using the values from separate regression models let's see what happens
+
+#To evaluate how good of a fit 
+lm(sample.Npubs ~ sample.gre.v)
+lm(sample.Npubs ~ sample.gre.q)
+
+#Then rewrite the eqation
+Pred <- -8.5 + .19*sample.gre.v + .19*sample.gre.q
+#The 8.5 comes from the mean of the two intercepts
+
+# Let's compute the residuals:
+Resid  <- sample.Npubs - Pred
+Resid2 <- Resid^2
+
+# Let's see how our prediction fits the actual Npubs:
+plot(sample.Npubs, Pred)
+sum(Resid) 
+mean(Resid) 
+sum(Resid2) 
+plot(sample.Npubs, Resid) 
+plot(Pred,Resid)
+
+#What you see is that it doesn't quite cut it. It's difficult to calculate the formula given the separate linear models that don't account for the degree to which gre v and gre q are correlated
+
+#Let's try a different formula
+lm(sample.Npubs ~ sample.gre.v + sample.gre.q)
+#This model places both predictos on the same side of the regression equation. This evokes the formula that considers the contribution of both variables at the same time.
+
+#Rewrite the eqation
+Pred <- -16.3150 + .1401*sample.gre.v + .1025*sample.gre.q
+#The 8.5 comes from the mean of the two intercepts
+
+# Let's compute the residuals:
+Resid  <- sample.Npubs - Pred
+Resid2 <- Resid^2
+
+# Let's see how our prediction fits the actual Npubs:
+plot(sample.Npubs, Pred)
+sum(Resid) 
+mean(Resid) 
+sum(Resid2) 
+plot(sample.Npubs, Resid) 
+plot(Pred,Resid)
+
+#Now we've reduced the variance while still preserving the balance between our residuals and x and making sure that our residuals are uncorrelated with our predictor.
