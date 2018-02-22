@@ -5,8 +5,8 @@ set.seed(1)
 N <- 1000 
 age.std       <- rnorm(n=N)
 # Creating agreeablenes and recklessness, both a function of age.std plus noise
-agreeableness <- rnorm(n=N)  + age.std
-recklessness  <- rnorm(n=N)  - age.std
+agreeableness <- rnorm(n=N)  # + age.std
+recklessness  <- rnorm(n=N)  # - age.std
 phonedependence <- rnorm(n=N) - 0.5*age.std
 # uncorrelated version below:
 # agreeableness <- rnorm(n=N) # + age.std

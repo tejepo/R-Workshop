@@ -117,3 +117,7 @@ plot(sample.Npubs, Resid)
 plot(Pred,Resid)
 
 #Now we've reduced the variance while still preserving the balance between our residuals and x and making sure that our residuals are uncorrelated with our predictor.
+
+#Question number 7
+#Ostensibly this exercise shows us that multiply regression, while still using the same fundamentals of OLS regression it's not enough to just run separate regressions and plug the slopes and intercepts into the multiple regression formula of yhat = ax1 + bx2 + e. The main problem with this is that the two variables are correlated and the slopes and intercepts are inaccurate estimates of the contribution of x1 on on yhat accounting for the influence odf x2. Instead, running a regression on both variables comboined will give you multiple slopes that have accounted for this influence. 
+

@@ -1,4 +1,4 @@
-set.seed(1)
+#set.seed(1)
 N <- 30
 
 x1 <- rnorm(n=N)
@@ -43,6 +43,8 @@ summary(lm(y~x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8))$adj.r.squared
 summary(lm(y~x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9))$adj.r.squared
 
 #The adjusted r-squared on the other hand takes into account whether the added variable actually meaningfully accounts for the variance in the y variable.
+
+#This is not usually a problem when you have a large sample. Remember the equation and how it, in part, relies on the degrees of freedom AND the n of your whole sample.
 
 # What is the "truth"? Increase N and find out
 

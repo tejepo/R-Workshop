@@ -43,3 +43,9 @@ summary(lm.perf.tts.apt)$r.squared - summary(lm.perf.tts)$r.squared
 #semi-partial correlations have two meanings and this code allows us to look at what they mean. This method is a way to control for/remove the effect of confounding variables among other things.
 
 #Suppresor varibles obscure the true relationship between a predictor and an outcome. When unaccounted for they can lead to type two errors, that is it can make it seem like there is no relationship. It's a kind of blind spot or confound. If you neglect to include these in your regression model then you're not controlling for their effects. As a result, identifying and adding suppresing variables to your multiple regression will allow you to better approximate the true relationship between your predictor and your outcome.
+
+#Doesn't relate to moderation
+
+#One way to tell whether or not there might be a suppression effect is to see to what degree the variables are correlated with one another. 
+
+
