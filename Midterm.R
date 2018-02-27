@@ -214,40 +214,53 @@ standardize = T
 
 if(standardize) {
   
-  m1 <- lm(DEP ~ SEX)
-  m1.5 <- lm(DEP ~ aUSE)
-  m2 <- lm(DEP ~ SEX + aUSE)
-  m3 <- lm(DEP ~ SEX + aUSE + PLAN)
+  depSex <- lm(scale(DEP) ~ scale(SEX))
+  depAlcohol <- lm(scale(DEP) ~ scale(aUSE))
+  depSexAlcohol <- lm(scale(DEP) ~ scale(SEX) + scale(aUSE))
+  depSexAlcoholPlan <- lm(scale(DEP) ~ scale(SEX) + scale(aUSE) + scale(PLAN))
 
+  #m1 <- lm(DEP ~ SEX)
+  #m1.5 <- lm(DEP ~ aUSE)
+  #m2 <- lm(DEP ~ SEX + aUSE)
+  #m3 <- lm(DEP ~ SEX + aUSE + PLAN)
+  
+  #depSex <- lm.beta(m1)
+  #depAlcohol <- lm.beta(m1.5)
+  #depSexAlcohol <- lm.beta(m2)
+  #depSexAlcoholPlan <- lm.beta(m3)
+  
 } else {
   
 #depSex <- lm.beta(m1)
 #depAlcohol <- lm.beta(m1.5)
-#depAlcoholSex <- lm.beta(m2)
-#depAlcoholSexPlan <- lm.beta(m3)
+#depSexAlcohol <- lm.beta(m2)
+#depSexAlcoholPlan <- lm.beta(m3)
 
-  depSex <- lm(scale(DEP) ~ scale(SEX))
-  deepAlcohol <- lm(scale(DEP) ~ scale(aUSE))
-  depAlcoholSex <- lm(scale(DEP) ~ scale(SEX) + scale(aUSE))
-  depAlcoholSexPlan <- lm(scale(DEP) ~ scale(SEX) + scale(aUSE) + scale(PLAN))
+  depSex <- lm(DEP ~ SEX)
+  depAlcohol <- lm(DEP ~ aUSE)
+  depSexAlcohol <- lm(DEP ~ SEX + aUSE)
+  depSexAlcoholPlan <- lm(DEP ~ SEX + aUSE + PLAN)
+  
 }
 
 summary(depSex)
 summary(depAlcohol)
-summary(depAlcoholSex)
-summary(depAlcoholSexPlan)
+summary(depSexAlcohol)
+summary(depSexAlcoholPlan)
 
-m1r2 <- summary(m1)$r.squared
-m1.5r2 <- summary(m1.5)$r.squared
-m2r2 <- summary(m2)$r.squared
-m3r2 <- summary(m3)$r.squared
+#for ease of use I'm grabbing the r squared values and putting them in their own data sets
+m1r2 <- summary(depSex)$r.squared
+m1.5r2 <- summary(depAlcohol)$r.squared
+m2r2 <- summary(depSexAlcohol)$r.squared
+m3r2 <- summary(depSexAlcoholPlan)$r.squared
 
-(m3r2 - m2r2)*100
+(m3r2 - m2r2)*100 #looking to see what proportion of the variance in y is accounted for by x1 above and beyond the variance explained by x2 and x3
 
-anova(m3, m2)
+anova(depSexAlcoholPlan, depSexAlcohol) #is the above difference significant
 
 #############Onto the actual graphing######
 
+#inital graph looking at the regression of depression onto planfulness not controlling for any other variables. This will show up on the final graph as a blue dotted line.
 ggplot(data = data, aes(x=planfulness, y= depression)) +
   geom_point(size = .4, alpha = .5) +
   geom_smooth(method = "lm", se = F) +
@@ -292,9 +305,24 @@ for (i in 1:length(xi)){
     theme_bw()
 )
 
+#What about those "lower" and "upper" values?
+(predsplot<-baseplot + 
+    
+    geom_point(aes(x=xi,preds$lower), size = .5) +
+    geom_point(aes(x=xi,preds$upper), size = .5)
+)
+
+#What if I don't want points?
+(predsplot<-baseplot + 
+    
+    geom_ribbon(aes(x=xi,ymin=preds$lower, ymax=preds$upper),alpha = .25)
+)
+
 #full plot adds everything together which shows the effect of x1 on y controlling for the other variables. This also shows the confidence intervals but I've turned the standard error lines off (se = F) because I don't need them for this analysis.
 (fullplot<-predsplot +
     geom_line(aes(x=xi,preds$ypred)) +
     geom_point(data = data, aes(x=planfulness, y= depression),size = .4, alpha = .5) +
     geom_smooth(data = data, aes(x=planfulness, y= depression),method = "lm", se = F, linetype = "dashed", size = .5)
 )
+
+#The black line is the best fit line of depression regressed onto planfulness controlling for alcohol use and sex. The blue line is depression regressed onto planfulness without controlling for the other variables.
