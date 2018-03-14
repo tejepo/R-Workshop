@@ -18,6 +18,7 @@ require(car) #a package I use to recode
 require(dplyr)
 require(lm.beta) #optional package. could also use QuantPsyc
 require(ggplot2) 
+require(pander)
 
 #reading the data file in from github
 data <-read.csv(text=getURL("https://raw.githubusercontent.com/tejepo/R-Workshop/master/Data/midtermDataPope.csv"))
@@ -218,16 +219,19 @@ if(standardize) {
   depAlcohol <- lm(scale(DEP) ~ scale(aUSE))
   depSexAlcohol <- lm(scale(DEP) ~ scale(SEX) + scale(aUSE))
   depSexAlcoholPlan <- lm(scale(DEP) ~ scale(SEX) + scale(aUSE) + scale(PLAN))
+  depPlan <- lm(scale(DEP) ~ scale(PLAN))
 
   #m1 <- lm(DEP ~ SEX)
   #m1.5 <- lm(DEP ~ aUSE)
   #m2 <- lm(DEP ~ SEX + aUSE)
   #m3 <- lm(DEP ~ SEX + aUSE + PLAN)
+  #m4 <- lm(DEP ~ PLAN)
   
   #depSex <- lm.beta(m1)
   #depAlcohol <- lm.beta(m1.5)
   #depSexAlcohol <- lm.beta(m2)
   #depSexAlcoholPlan <- lm.beta(m3)
+  #depPlan <- lm.beta(m4)
   
 } else {
   
@@ -235,11 +239,13 @@ if(standardize) {
 #depAlcohol <- lm.beta(m1.5)
 #depSexAlcohol <- lm.beta(m2)
 #depSexAlcoholPlan <- lm.beta(m3)
+#depPlan <- lm.beta(m4)
 
   depSex <- lm(DEP ~ SEX)
   depAlcohol <- lm(DEP ~ aUSE)
   depSexAlcohol <- lm(DEP ~ SEX + aUSE)
   depSexAlcoholPlan <- lm(DEP ~ SEX + aUSE + PLAN)
+  depPlan <- lm(DEP ~ PLAN)
   
 }
 
@@ -247,14 +253,48 @@ summary(depSex)
 summary(depAlcohol)
 summary(depSexAlcohol)
 summary(depSexAlcoholPlan)
+summary(depPlan)
+
+
+confint(depSex)
+confint(depAlcohol)
+confint(depSexAlcohol)
+confint(depSexAlcoholPlan)
+confint(depPlan)
+
+#After looking at these statistics something becomes apparent. Though Alcohol Use doen't predict depression, it does seem to be a confounding variable for planning. 
+
+#In this model planingfulness significantly predicts depression
+summary(lm(DEP ~ SEX + PLAN))
+
+#however, in this model planingfulness is not significant. Suggesting that planingfulness is confounded/mediated by alcohol use...
+summary(lm(DEP ~ aUSE + PLAN))
+
+#What we see is that there's a significant interaction between alcohol use and planning
+depAlcoholPlan.cen<-lm(DEP~scale(aUSE,scale=F) +
+                         scale(PLAN,scale=F) +
+                         scale(aUSE,scale=F)*scale(PLAN,scale=F), data)
+pander(summary(depAlcoholPlan.cen))
+
+#Looking at both interactions
+depAlcoholPlan.cen<-lm(DEP~scale(aUSE,scale=F) +
+                         SEX +
+                         scale(PLAN,scale=F) +
+                         scale(aUSE,scale=F)*scale(PLAN,scale=F) +
+                         SEX*scale(PLAN,scale=F), data)
+pander(summary(depAlcoholPlan.cen))
+
+#Difficult explore with my current level of knowledge but, there's something at least.
 
 #for ease of use I'm grabbing the r squared values and putting them in their own data sets
 m1r2 <- summary(depSex)$r.squared
 m1.5r2 <- summary(depAlcohol)$r.squared
 m2r2 <- summary(depSexAlcohol)$r.squared
 m3r2 <- summary(depSexAlcoholPlan)$r.squared
+m4r2 <- summary(depPlan)$r.squared
 
 (m3r2 - m2r2)*100 #looking to see what proportion of the variance in y is accounted for by x1 above and beyond the variance explained by x2 and x3
+(m4r2 - m3r2)*100 
 
 anova(depSexAlcoholPlan, depSexAlcohol) #is the above difference significant
 
@@ -294,7 +334,7 @@ for (i in 1:length(xi)){
 (baseplot<-ggplot() +
     #We can plot our points as points...
     # geom_point(aes(x=xi,preds$ypred)) +
-    
+    ggtitle("The Effect of Planfulness on Depression") +
     #But we can easily just say we want a line instead.
     geom_line(aes(x=xi,preds$ypred)) +
     
@@ -302,7 +342,7 @@ for (i in 1:length(xi)){
     xlim(min(data$planfulness), max(data$planfulness)) +
     ylim(min(data$depression), max(data$depression)) +
     labs(x="Planfulness",y="Depression") +
-    theme_bw()
+    theme(plot.title = element_text(hjust = 0.5))
 )
 
 #What about those "lower" and "upper" values?
@@ -325,4 +365,5 @@ for (i in 1:length(xi)){
     geom_smooth(data = data, aes(x=planfulness, y= depression),method = "lm", se = F, linetype = "dashed", size = .5)
 )
 
-#The black line is the best fit line of depression regressed onto planfulness controlling for alcohol use and sex. The blue line is depression regressed onto planfulness without controlling for the other variables.
+e#The black line is the best fit line of depression regressed onto planfulness controlling for alcohol use and sex. The blue line is depression regressed onto planfulness without controlling for the other variables.
+
